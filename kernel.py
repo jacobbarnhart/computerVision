@@ -12,6 +12,7 @@ class kernel:
         self.img = np.array(self.img)
 
 
+    # Main functions
     def reset(self):
         self.img = color.rgb2gray(io.imread(self.path))
         self.img = np.array(self.img)
@@ -45,6 +46,23 @@ class kernel:
                 result[int(((i - size) / stride) + 1), int(((j - size) / stride) + 1)] = np.sum(np.multiply(self.img[i:i + size, j:j + size], sharpenKernel))
         self.img = result
 
+    def boxBlur(self, size, stride, str=None):
+        row, col = self.img.shape
+        boxKernel = self.boxKernel(size, str)
+        result = np.zeros((int(((row - size) / stride) + 1), int(((col - size) / stride) + 1)))
+        for i in range(0, row - size, stride):
+            for j in range(0, col - size, stride):
+                result[int(((i - size) / stride) + 1), int(((j - size) / stride) + 1)] = np.sum(np.multiply(self.img[i:i + size, j:j + size], boxKernel))
+        self.img = result
+
+    def plot(self):
+        plt.imshow(self.img, cmap=plt.get_cmap('gray'), vmin=0, vmax=1)
+        plt.show()
+
+
+
+
+    # Helper Methods
     def edgeKernel(self, size, str):
         if size % 2 == 0:
             raise Exception("Size cannot be even!")
@@ -53,12 +71,11 @@ class kernel:
         result[int(size / 2), int(size / 2)] = str
         return result
 
-    def plot(self):
-        plt.imshow(self.img, cmap=plt.get_cmap('gray'), vmin=0, vmax=1)
-        plt.show()
-
-    # img = maxpool(img, 2, 1)
-
-
-    # plt.imshow(img, cmap=plt.get_cmap('gray'), vmin=0, vmax=1)
-    # plt.show()
+    def boxKernel(self, size, str):
+        result = np.ones((size, size))
+        if str == None:
+            result = result / (size * size)
+        else:
+            result = result / str
+        return result
+        
